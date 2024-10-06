@@ -28,8 +28,7 @@ public class Main {
 			user = keyboardInput.readLine();
 			System.out.println("Please enter camera password:");
 			password = keyboardInput.readLine();
-		}
-		catch (IOException e1) {
+		} catch (IOException e1) {
 			e1.printStackTrace();
 			return;
 		}
@@ -37,9 +36,8 @@ public class Main {
 		System.out.println("Connect to camera, please wait ...");
 		OnvifDevice cam;
 		try {
-			cam = new OnvifDevice(cameraAddress, user, password);
-		}
-		catch (ConnectException | SOAPException e1) {
+			cam = new OnvifDevice(cameraAddress, user, password, true);
+		} catch (ConnectException | SOAPException e1) {
 			System.err.println("No connection to camera, please try again.");
 			return;
 		}
@@ -52,40 +50,39 @@ public class Main {
 				input = keyboardInput.readLine();
 
 				switch (input) {
-				case "url": {
-					List<Profile> profiles = cam.getDevices().getProfiles();
-					for (Profile p : profiles) {
-						try {
-							System.out.println("URL from Profile \'" + p.getName() + "\': " + cam.getMedia().getSnapshotUri(p.getToken()));
+					case "url": {
+						List<Profile> profiles = cam.getDevices().getProfiles();
+						for (Profile p : profiles) {
+							try {
+								System.out.println("URL from Profile \'" + p.getName() + "\': "
+										+ cam.getMedia().getSnapshotUri(p.getToken()));
+							} catch (SOAPException e) {
+								System.err.println("Cannot grap snapshot URL, got Exception " + e.getMessage());
+							}
 						}
-						catch (SOAPException e) {
-							System.err.println("Cannot grap snapshot URL, got Exception "+e.getMessage());
+						break;
+					}
+					case "profiles":
+						List<Profile> profiles = cam.getDevices().getProfiles();
+						System.out.println("Number of profiles: " + profiles.size());
+						for (Profile p : profiles) {
+							System.out.println("  Profile " + p.getName() + " token is: " + p.getToken());
 						}
-					}
-					break;
+						break;
+					case "info":
+						System.out.println(INFO);
+						break;
+					case "quit":
+					case "exit":
+					case "end":
+						return;
+					default:
+						System.out.println("Unknown command!");
+						System.out.println();
+						System.out.println(INFO);
+						break;
 				}
-				case "profiles":
-					List<Profile> profiles = cam.getDevices().getProfiles();
-					System.out.println("Number of profiles: " + profiles.size());
-					for (Profile p : profiles) {
-						System.out.println("  Profile "+p.getName()+" token is: "+p.getToken());
-					}
-					break;
-				case "info":
-					System.out.println(INFO);
-					break;
-				case "quit":
-				case "exit":
-				case "end":
-					return;
-				default:
-					System.out.println("Unknown command!");
-					System.out.println();
-					System.out.println(INFO);
-					break;
-				}
-			}
-			catch (IOException e) {
+			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}

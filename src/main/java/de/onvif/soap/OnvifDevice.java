@@ -67,7 +67,8 @@ public class OnvifDevice {
 	 *                          and doesn't answer to SOAP messages
 	 * @throws SOAPException
 	 */
-	public OnvifDevice(String hostIp, String user, String password) throws ConnectException, SOAPException {
+	public OnvifDevice(String hostIp, String user, String password, boolean log)
+			throws ConnectException, SOAPException {
 		this.logger = new Logger();
 
 		this.HOST_IP = hostIp;
@@ -82,6 +83,7 @@ public class OnvifDevice {
 		this.password = password;
 
 		this.soap = new SOAP(this);
+		this.soap.setLogging(log);
 		this.initialDevices = new InitialDevices(this);
 		this.ptzDevices = new PtzDevices(this);
 		this.mediaDevices = new MediaDevices(this);
@@ -104,7 +106,7 @@ public class OnvifDevice {
 	 * @throws SOAPException
 	 */
 	public OnvifDevice(String hostIp) throws ConnectException, SOAPException {
-		this(hostIp, null, null);
+		this(hostIp, null, null, false);
 	}
 
 	/**

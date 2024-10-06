@@ -3,6 +3,7 @@ package de.onvif.soap.devices;
 import java.net.ConnectException;
 import java.util.List;
 
+import javax.xml.datatype.Duration;
 import javax.xml.soap.SOAPException;
 
 import org.onvif.ver10.schema.FloatRange;
@@ -67,7 +68,7 @@ public class PtzDevices {
 		}
 		Profile profile = onvifDevice.getDevices().getProfile(profileToken);
 		if (profile == null) {
-			throw new IllegalArgumentException("No profile available for token: "+profileToken);
+			throw new IllegalArgumentException("No profile available for token: " + profileToken);
 		}
 		if (profile.getPTZConfiguration() == null) {
 			return null; // no PTZ support
@@ -82,8 +83,7 @@ public class PtzDevices {
 
 		try {
 			response = (GetNodesResponse) soap.createSOAPDeviceRequest(request, response, true);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -110,8 +110,7 @@ public class PtzDevices {
 
 		try {
 			response = (GetNodeResponse) soap.createSOAPDeviceRequest(request, response, true);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -150,8 +149,7 @@ public class PtzDevices {
 			if (profile.getPTZConfiguration().getDefaultAbsolutePantTiltPositionSpace() != null) {
 				return true;
 			}
-		}
-		catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 		}
 		return false;
 	}
@@ -159,11 +157,11 @@ public class PtzDevices {
 	/**
 	 * 
 	 * @param x
-	 *            Pan-Position
+	 *             Pan-Position
 	 * @param y
-	 *            Tilt-Position
+	 *             Tilt-Position
 	 * @param zoom
-	 *            Zoom
+	 *             Zoom
 	 * @see getPanSpaces(), getTiltSpaces(), getZoomSpaces()
 	 * @return True if move successful
 	 * @throws SOAPException
@@ -204,11 +202,9 @@ public class PtzDevices {
 
 		try {
 			response = (AbsoluteMoveResponse) soap.createSOAPPtzRequest(request, response, true);
-		}
-		catch (SOAPException e) {
+		} catch (SOAPException e) {
 			throw e;
-		}
-		catch (ConnectException e) {
+		} catch (ConnectException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -226,8 +222,7 @@ public class PtzDevices {
 			if (profile.getPTZConfiguration().getDefaultRelativePanTiltTranslationSpace() != null) {
 				return true;
 			}
-		}
-		catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 		}
 		return false;
 	}
@@ -251,8 +246,7 @@ public class PtzDevices {
 
 		try {
 			response = (RelativeMoveResponse) soap.createSOAPPtzRequest(request, response, true);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -270,13 +264,12 @@ public class PtzDevices {
 			if (profile.getPTZConfiguration().getDefaultContinuousPanTiltVelocitySpace() != null) {
 				return true;
 			}
-		}
-		catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 		}
 		return false;
 	}
 
-	public boolean continuousMove(String profileToken, float x, float y, float zoom) {
+	public boolean continuousMove(String profileToken, float x, float y, float zoom, Duration timeout) {
 		ContinuousMove request = new ContinuousMove();
 		ContinuousMoveResponse response = new ContinuousMoveResponse();
 
@@ -290,13 +283,13 @@ public class PtzDevices {
 		ptzSpeed.setPanTilt(panTiltVector);
 		ptzSpeed.setZoom(zoomVector);
 		request.setVelocity(ptzSpeed);
+		request.setTimeout(timeout);
 
 		request.setProfileToken(profileToken);
 
 		try {
 			response = (ContinuousMoveResponse) soap.createSOAPPtzRequest(request, response, true);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -318,8 +311,7 @@ public class PtzDevices {
 
 		try {
 			response = (StopResponse) soap.createSOAPPtzRequest(request, response, true);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -339,8 +331,7 @@ public class PtzDevices {
 
 		try {
 			response = (GetStatusResponse) soap.createSOAPPtzRequest(request, response, false);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -370,8 +361,7 @@ public class PtzDevices {
 
 		try {
 			response = (SetHomePositionResponse) soap.createSOAPPtzRequest(request, response, true);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -391,8 +381,7 @@ public class PtzDevices {
 
 		try {
 			response = (GetPresetsResponse) soap.createSOAPPtzRequest(request, response, true);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -414,8 +403,7 @@ public class PtzDevices {
 
 		try {
 			response = (SetPresetResponse) soap.createSOAPPtzRequest(request, response, true);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -440,8 +428,7 @@ public class PtzDevices {
 
 		try {
 			response = (RemovePresetResponse) soap.createSOAPPtzRequest(request, response, true);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return false;
 		}
@@ -462,8 +449,7 @@ public class PtzDevices {
 
 		try {
 			response = (GotoPresetResponse) soap.createSOAPPtzRequest(request, response, true);
-		}
-		catch (SOAPException | ConnectException e) {
+		} catch (SOAPException | ConnectException e) {
 			e.printStackTrace();
 			return false;
 		}
