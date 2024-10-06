@@ -55,16 +55,17 @@ public class OnvifDevice {
 	 * logindata.
 	 * 
 	 * @param hostIp
-	 *            The IP address of your device, you can also add a port but
-	 *            noch protocol (e.g. http://)
+	 *                 The IP address of your device, you can also add a port but
+	 *                 noch protocol (e.g. http://)
 	 * @param user
-	 *            Username you need to login
+	 *                 Username you need to login
 	 * @param password
-	 *            User's password to login
+	 *                 User's password to login
 	 * @throws ConnectException
-	 *             Exception gets thrown, if device isn't accessible or invalid
-	 *             and doesn't answer to SOAP messages
-	 * @throws SOAPException 
+	 *                          Exception gets thrown, if device isn't accessible or
+	 *                          invalid
+	 *                          and doesn't answer to SOAP messages
+	 * @throws SOAPException
 	 */
 	public OnvifDevice(String hostIp, String user, String password) throws ConnectException, SOAPException {
 		this.logger = new Logger();
@@ -85,7 +86,7 @@ public class OnvifDevice {
 		this.ptzDevices = new PtzDevices(this);
 		this.mediaDevices = new MediaDevices(this);
 		this.imagingDevices = new ImagingDevices(this);
-		
+
 		init();
 	}
 
@@ -94,12 +95,13 @@ public class OnvifDevice {
 	 * logindata.
 	 * 
 	 * @param hostIp
-	 *            The IP address of your device, you can also add a port but
-	 *            noch protocol (e.g. http://)
+	 *               The IP address of your device, you can also add a port but
+	 *               noch protocol (e.g. http://)
 	 * @throws ConnectException
-	 *             Exception gets thrown, if device isn't accessible or invalid
-	 *             and doesn't answer to SOAP messages
-	 * @throws SOAPException 
+	 *                          Exception gets thrown, if device isn't accessible or
+	 *                          invalid
+	 *                          and doesn't answer to SOAP messages
+	 * @throws SOAPException
 	 */
 	public OnvifDevice(String hostIp) throws ConnectException, SOAPException {
 		this(hostIp, null, null);
@@ -112,24 +114,21 @@ public class OnvifDevice {
 	private boolean isOnline() {
 		String port = HOST_IP.contains(":") ? HOST_IP.substring(HOST_IP.indexOf(':') + 1) : "80";
 		String ip = HOST_IP.contains(":") ? HOST_IP.substring(0, HOST_IP.indexOf(':')) : HOST_IP;
-		
+
 		Socket socket = null;
 		try {
-			SocketAddress sockaddr = new InetSocketAddress(ip, new Integer(port));
+			SocketAddress sockaddr = new InetSocketAddress(ip, Integer.parseInt(port));
 			socket = new Socket();
 
 			socket.connect(sockaddr, 5000);
-		}
-		catch (NumberFormatException | IOException e) {
+		} catch (NumberFormatException | IOException e) {
 			return false;
-		}
-		finally {
+		} finally {
 			try {
 				if (socket != null) {
 					socket.close();
 				}
-			}
-			catch (IOException ex) {
+			} catch (IOException ex) {
 			}
 		}
 		return true;
@@ -140,9 +139,9 @@ public class OnvifDevice {
 	 * IP, if given IP is a proxy.
 	 * 
 	 * @throws ConnectException
-	 *             Get thrown if device doesn't give answers to
-	 *             GetCapabilities()
-	 * @throws SOAPException 
+	 *                          Get thrown if device doesn't give answers to
+	 *                          GetCapabilities()
+	 * @throws SOAPException
 	 */
 	protected void init() throws ConnectException, SOAPException {
 		Capabilities capabilities = getDevices().getCapabilities();
@@ -156,11 +155,10 @@ public class OnvifDevice {
 		if (localDeviceUri.startsWith("http://")) {
 			originalIp = localDeviceUri.replace("http://", "");
 			originalIp = originalIp.substring(0, originalIp.indexOf('/'));
-		}
-		else {
+		} else {
 			logger.error("Unknown/Not implemented local procotol!");
 		}
-			
+
 		if (!originalIp.equals(HOST_IP)) {
 			isProxy = true;
 		}
@@ -172,7 +170,7 @@ public class OnvifDevice {
 		if (capabilities.getPTZ() != null && capabilities.getPTZ().getXAddr() != null) {
 			serverPtzUri = replaceLocalIpWithProxyIp(capabilities.getPTZ().getXAddr());
 		}
-		
+
 		if (capabilities.getImaging() != null && capabilities.getImaging().getXAddr() != null) {
 			serverImagingUri = replaceLocalIpWithProxyIp(capabilities.getImaging().getXAddr());
 		}
@@ -184,9 +182,9 @@ public class OnvifDevice {
 
 	public String replaceLocalIpWithProxyIp(String original) {
 		if (original.startsWith("http:///")) {
-			original.replace("http:///", "http://"+HOST_IP);
+			original.replace("http:///", "http://" + HOST_IP);
 		}
-		
+
 		if (isProxy) {
 			return original.replace(originalIp, HOST_IP);
 		}
@@ -202,7 +200,8 @@ public class OnvifDevice {
 	}
 
 	/**
-	 * Returns encrypted version of given password like algorithm like in WS-UsernameToken
+	 * Returns encrypted version of given password like algorithm like in
+	 * WS-UsernameToken
 	 */
 	public String encryptPassword() {
 		String nonce = getNonce();
@@ -213,8 +212,7 @@ public class OnvifDevice {
 		byte[] encryptedRaw;
 		try {
 			encryptedRaw = sha1(beforeEncryption);
-		}
-		catch (NoSuchAlgorithmException e) {
+		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -286,6 +284,7 @@ public class OnvifDevice {
 
 	/**
 	 * Can be used to get media data from OnvifDevice
+	 * 
 	 * @return
 	 */
 	public MediaDevices getMedia() {
@@ -294,6 +293,7 @@ public class OnvifDevice {
 
 	/**
 	 * Can be used to get media data from OnvifDevice
+	 * 
 	 * @return
 	 */
 	public ImagingDevices getImaging() {
@@ -323,19 +323,19 @@ public class OnvifDevice {
 	protected String getEventsUri() {
 		return serverEventsUri;
 	}
-	
+
 	public Date getDate() {
 		return initialDevices.getDate();
 	}
-	
+
 	public String getName() {
 		return initialDevices.getDeviceInformation().getModel();
 	}
-	
+
 	public String getHostname() {
 		return initialDevices.getHostname();
 	}
-	
+
 	public String reboot() throws ConnectException, SOAPException {
 		return initialDevices.reboot();
 	}
