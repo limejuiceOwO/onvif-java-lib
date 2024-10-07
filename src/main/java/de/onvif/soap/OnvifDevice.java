@@ -341,4 +341,12 @@ public class OnvifDevice {
 	public String reboot() throws ConnectException, SOAPException {
 		return initialDevices.reboot();
 	}
+
+	public void setConnTimeout(int timeout) {
+		this.soap.setConnTimeout(timeout);
+	}
+
+	public void setReadTimeout(int timeout) {
+		this.soap.setReadTimeout(timeout);
+	}
 }

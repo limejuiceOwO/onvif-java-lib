@@ -3,6 +3,9 @@ package de.onvif.soap;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLStreamHandler;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -30,13 +33,25 @@ public class SOAP {
 
 	private OnvifDevice onvifDevice;
 
+	private int connTimeout = 1000;
+	private int readTimeout = 1000;
+
 	public SOAP(OnvifDevice onvifDevice) {
 		super();
 
 		this.onvifDevice = onvifDevice;
 	}
 
-	public Object createSOAPDeviceRequest(Object soapRequestElem, Object soapResponseElem, boolean needsAuthentification) throws SOAPException,
+	public void setConnTimeout(int timeout) {
+		this.connTimeout = timeout;
+	}
+
+	public void setReadTimeout(int timeout) {
+		this.readTimeout = timeout;
+	}
+
+	public Object createSOAPDeviceRequest(Object soapRequestElem, Object soapResponseElem,
+			boolean needsAuthentification) throws SOAPException,
 			ConnectException {
 		return createSOAPRequest(soapRequestElem, soapResponseElem, onvifDevice.getDeviceUri(), needsAuthentification);
 	}
@@ -86,7 +101,21 @@ public class SOAP {
 				System.out.println();
 			}
 
-			soapResponse = soapConnection.call(soapMessage, soapUri);
+			URL endpoint = new URL(null,
+					soapUri,
+					new URLStreamHandler() {
+						@Override
+						protected URLConnection openConnection(URL url) throws IOException {
+							URL target = new URL(url.toString());
+							URLConnection connection = target.openConnection();
+							// Connection settings
+							connection.setConnectTimeout(connTimeout);
+							connection.setReadTimeout(readTimeout);
+							return (connection);
+						}
+					});
+
+			soapResponse = soapConnection.call(soapMessage, endpoint);
 
 			// print SOAP Response
 			if (isLogging()) {
